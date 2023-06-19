@@ -1,0 +1,15 @@
+{
+  "name": "paper-pad",
+  "version": "1.0.0",
+  "description": "PaperPad - Your digital notebook for organizing ideas, jotting down notes, and capturing creative thoughts with the simplicity of pen and paper.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Nipun Gupta",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.3.0"
+  }
+}
