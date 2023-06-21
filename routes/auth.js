@@ -4,6 +4,7 @@ const router=express.Router()
 const { body, matchedData, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const fetchdata=require('../middleware/fetchdata')
 require('dotenv').config()
 
 // Creating a new User- NO login Required
@@ -78,5 +79,17 @@ router.post('/login',[body('email','Enter a valid email').isEmail(),body('passwo
         res.status(500).json({err:"We are Sorry"})
     }
 
+})
+router.post('/getuser', fetchdata ,async(req,res)=>{
+    try{
+        userId=req.user.id;
+        const user= await User.findById(userId).select("-password")
+        res.send(user);
+
+    }
+    catch(error){
+        console.error(error.message)
+        res.status(500).send("Internal Server Error")
+    }
 })
 module.exports= router
