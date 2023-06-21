@@ -6,11 +6,12 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 require('dotenv').config()
 
-router.post('/createuser',[body('email').isEmail(),body('name').isLength({min:'3'})],async(req,res)=>{
+// Creating a new User- NO login Required
+router.post('/createuser',[body('email','Enter a valid email').isEmail(),body('name').isLength({min:'3'})],async(req,res)=>{
     const result = validationResult(req);//Checking For errors
     if (result.isEmpty()) {
         // Checking if email alredy exist in db
-
+        try{
         let user=await User.findOne({email:req.body.email});
         var salt = await bcrypt.genSaltSync(10);
         let secpass= await bcrypt.hash(req.body.password, salt);
@@ -32,7 +33,11 @@ router.post('/createuser',[body('email').isEmail(),body('name').isLength({min:'3
             const token = jwt.sign(data,secret);
             res.json({token})
         }
-            
+        }
+        catch(err){
+            console.error(err.message)
+            res.status(500).json({err:"We are Sorry"})
+        }
 
     }
     else{
@@ -40,4 +45,38 @@ router.post('/createuser',[body('email').isEmail(),body('name').isLength({min:'3
     }
 })
 
+
+
+// Login
+router.post('/login',[body('email','Enter a valid email').isEmail(),body('password',"Password cant be empty").isLength({min:'0'})],async(req,res)=>{
+    const result = validationResult(req);
+    if(!result.isEmpty()){
+        return res.send({ errors: result.array() });
+    }
+    const {email,password}=req.body;
+    const secret=process.env.JWT_SECRET;
+    try{
+        let user= await User.findOne({email:email});
+        if(!user){
+            return res.status(400).json({error:"Please try to login with valid credentials"})
+        }
+
+        const passcompare=await bcrypt.compare(password,user.password);
+        if(!passcompare){
+            return res.status(400).json({error:"Please try to login with valid credentials"})
+        }
+        const data={
+            user:{
+                id:user.id
+            }
+        }
+        const token = jwt.sign(data,secret);
+        res.json({token})
+    }
+    catch(err){
+        console.error(err.message)
+        res.status(500).json({err:"We are Sorry"})
+    }
+
+})
 module.exports= router
