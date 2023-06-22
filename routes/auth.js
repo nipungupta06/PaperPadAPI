@@ -36,8 +36,8 @@ router.post('/createuser',[body('email','Enter a valid email').isEmail(),body('n
         }
         }
         catch(err){
-            console.error(err.message)
-            res.status(500).json({err:"We are Sorry"})
+            console.error(error.message)
+        res.status(500).send("Internal Server Error")
         }
 
     }
@@ -75,8 +75,8 @@ router.post('/login',[body('email','Enter a valid email').isEmail(),body('passwo
         res.json({token})
     }
     catch(err){
-        console.error(err.message)
-        res.status(500).json({err:"We are Sorry"})
+        console.error(error.message)
+        res.status(500).send("Internal Server Error")
     }
 
 })
