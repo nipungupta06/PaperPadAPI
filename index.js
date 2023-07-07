@@ -1,7 +1,9 @@
 const connectToMongo =require("./db")
 const express = require('express')
-const app = express()
+var cors = require('cors')
 
+const app = express()
+app.use(cors())
 connectToMongo();
 
 app.use(express.json())

@@ -13,12 +13,13 @@ router.post('/createuser',[body('email','Enter a valid email').isEmail(),body('n
     if (result.isEmpty()) {
         // Checking if email alredy exist in db
         try{
+            let success=false;
         let user=await User.findOne({email:req.body.email});
         var salt = await bcrypt.genSaltSync(10);
         let secpass= await bcrypt.hash(req.body.password, salt);
         const secret=process.env.JWT_SECRET;
         if(user){
-            return res.status(400).json({err:"Sorry But the email you entered already exists"})
+            return res.status(400).json({success,err:"Sorry But the email you entered already exists"})
         }
         else{
             const user=await User.create({
@@ -32,17 +33,18 @@ router.post('/createuser',[body('email','Enter a valid email').isEmail(),body('n
                 }
             }
             const token = jwt.sign(data,secret);
-            res.json({token})
+            success=true;
+            res.json({success,token})
         }
         }
         catch(err){
             console.error(error.message)
-        res.status(500).send("Internal Server Error")
+        res.status(500).json({success,error:"Internal Server Error"})
         }
 
     }
     else{
-        res.send({ errors: result.array() });
+        res.json({ success,errors: result.array() });
     }
 })
 
@@ -56,23 +58,25 @@ router.post('/login',[body('email','Enter a valid email').isEmail(),body('passwo
     }
     const {email,password}=req.body;
     const secret=process.env.JWT_SECRET;
+    let success=false;
     try{
         let user= await User.findOne({email:email});
         if(!user){
-            return res.status(400).json({error:"Please try to login with valid credentials"})
+            return res.status(400).json({success,error:"Please try to login with valid credentials"})
         }
 
         const passcompare=await bcrypt.compare(password,user.password);
         if(!passcompare){
-            return res.status(400).json({error:"Please try to login with valid credentials"})
+            return res.status(400).json({success,error:"Please try to login with valid credentials"})
         }
         const data={
             user:{
                 id:user.id
             }
         }
+        success=true;
         const token = jwt.sign(data,secret);
-        res.json({token})
+        res.json({success,token})
     }
     catch(err){
         console.error(error.message)

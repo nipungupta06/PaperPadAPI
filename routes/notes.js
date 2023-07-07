@@ -9,7 +9,7 @@ router.get('/fetchallnotes',fetchUser,async(req,res)=>{
     res.json(notes);
 })
 
-router.post('/addnote',fetchUser,[body('title','Title is compulsory').isLength({min: 1}),body("description",'Enter a Description').isLength({ min: 1 })],async(req,res)=>{
+router.post('/addnote',fetchUser,[body('title','Title is compulsory').isLength({min: 1}),body("description",'Enter a Description').isLength({ min: 0 })],async(req,res)=>{
     const result = validationResult(req);
     if(!result.isEmpty()){
         return res.status(400).send({ errors: result.array() });
